@@ -1,3 +1,5 @@
+const { EmbedBuilder } = require('discord.js');
+
 module.exports = {
 	name: 'guildMemberRemove',
 	execute: async (member, client) => {
@@ -9,10 +11,11 @@ module.exports = {
 			(ch) => ch.id === settings.logs.general
 		);
 		if (joinNotify) {
-			const embed = new ShadowEmbed()
+			const embed = new EmbedBuilder()
 				.setColor('Orange')
+				.setTitle('Member Left')
 				.setDescription(
-					`${member} (${member.user.username} - ${member.user.id}) **Left**`
+					`${member} (${member.user.username} - ${member.user.id})`
 				)
 				.setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
 				.setTimestamp()

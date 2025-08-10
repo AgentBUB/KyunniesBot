@@ -39,6 +39,10 @@ module.exports = {
 					name: 'Notifications Pings',
 					value: '> Set who gets pinged when notifications are sent.',
 				},
+				{
+					name: 'Chat Filter',
+					value: '> Enable the chat filter and configure its settings.',
+				},
 			])
 			.setFooter({
 				text: `Kyunnies Bot Settings${isOwner ? ' - Owner Access' : ''}`,
@@ -61,7 +65,11 @@ module.exports = {
 			new ButtonBuilder()
 				.setStyle('Primary')
 				.setLabel('Mute Role')
-				.setCustomId(`setMuteRole-${interaction.user.id}`)
+				.setCustomId(`setMuteRole-${interaction.user.id}`),
+			new ButtonBuilder()
+				.setStyle('Primary')
+				.setLabel('Chat Filter')
+				.setCustomId(`setChatFilter-${interaction.user.id}`)
 		);
 
 		let ownerButtons;
@@ -70,15 +78,15 @@ module.exports = {
 				new ButtonBuilder()
 					.setStyle('Primary')
 					.setLabel('Twitch API Keys')
-					.setCustomId(`${interaction.user.id}-setModal_`),
+					.setCustomId(`${interaction.user.id}-setModal_twitch`),
 				new ButtonBuilder()
 					.setStyle('Primary')
 					.setLabel('Youtube API Keys')
-					.setCustomId(`${interaction.user.id}-setModal_`),
+					.setCustomId(`${interaction.user.id}-setModal_youtube`),
 				new ButtonBuilder()
 					.setStyle('Primary')
 					.setLabel('Twitter API Keys')
-					.setCustomId(`${interaction.user.id}-setModal_`)
+					.setCustomId(`${interaction.user.id}-setModal_twitter`)
 			);
 		}
 

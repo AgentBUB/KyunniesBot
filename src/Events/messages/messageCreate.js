@@ -1,3 +1,5 @@
+const filter = require('../../Structures/ChatFilter');
+
 module.exports = {
 	name: 'messageCreate',
 	execute: async (message, client) => {
@@ -50,10 +52,24 @@ module.exports = {
 					},
 				},
 				muteRole: null,
+				chatFilter: {
+					enabled: false,
+					warningMessage: false,
+					autoKick: false,
+					whitelist: {
+						users: [],
+						roles: [],
+						content: [],
+					},
+					blacklist: [],
+				},
 			});
 		}
 
 		if (message.author.bot) return;
+
+		if (message.guild && settings?.chatFilter?.enabled)
+			await filter(message, client);
 
 		const mentionRegex = RegExp(`^<@!?${client.user.id}>$`);
 		if (message.content.match(mentionRegex)) {

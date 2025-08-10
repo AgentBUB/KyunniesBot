@@ -64,6 +64,17 @@ module.exports = {
 					},
 				},
 				muteRole: null,
+				chatFilter: {
+					enabled: false,
+					warningMessage: false,
+					autoKick: false,
+					whitelist: {
+						users: [],
+						roles: [],
+						content: [],
+					},
+					blacklist: [],
+				},
 			});
 		}
 

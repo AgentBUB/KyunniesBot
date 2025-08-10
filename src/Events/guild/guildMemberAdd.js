@@ -4,14 +4,6 @@ module.exports = {
 	name: 'guildMemberAdd',
 	execute: async (member, client) => {
 		try {
-			const activeMute = await client.db.collection('muted').findOne({
-				id: member.guild.id,
-				user: member.id,
-			});
-			if (!activeMute) {
-				return;
-			}
-
 			const settings = await client.db.collection('settings').findOne({
 				id: member.guild.id,
 			});
@@ -20,16 +12,25 @@ module.exports = {
 				(ch) => ch.id === settings.logs.general
 			);
 			if (joinNotify) {
-				const embed = new ShadowEmbed()
+				const embed = new EmbedBuilder()
 					.setColor('Green')
+					.setTitle('Member Joined')
 					.setDescription(
-						`${member} (${member.user.username} - ${member.user.id}) **Joined**`
+						`${member} (${member.user.username} - ${member.user.id})`
 					)
 					.setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
 					.setTimestamp()
 					.setFooter({ text: 'Shadow Logging System' });
 
 				joinNotify.send({ embeds: [embed] });
+			}
+
+			const activeMute = await client.db.collection('muted').findOne({
+				id: member.guild.id,
+				user: member.id,
+			});
+			if (!activeMute) {
+				return;
 			}
 
 			if (!settings?.muteRole) {

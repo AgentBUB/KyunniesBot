@@ -53,6 +53,11 @@ module.exports = {
 						name: 'Notifications Pings',
 						value: '> Set who gets pinged when notifications are sent.',
 					},
+					{
+						name: 'Chat Filter',
+						value:
+							'> Enable/Disable the chat filter and configure its settings.',
+					},
 				])
 				.setFooter({
 					text: `Kyunnies Bot Settings System`,
@@ -75,7 +80,11 @@ module.exports = {
 				new ButtonBuilder()
 					.setStyle('Primary')
 					.setLabel('Mute Role')
-					.setCustomId(`setMuteRole-${interaction.user.id}`)
+					.setCustomId(`setMuteRole-${interaction.user.id}`),
+				new ButtonBuilder()
+					.setStyle('Primary')
+					.setLabel('Chat Filter')
+					.setCustomId(`setChatFilter-${interaction.user.id}`)
 			);
 
 			let ownerButtons;
@@ -84,15 +93,15 @@ module.exports = {
 					new ButtonBuilder()
 						.setStyle('Primary')
 						.setLabel('Twitch API Keys')
-						.setCustomId(`${interaction.user.id}-setModal_`),
+						.setCustomId(`${interaction.user.id}-setModal_twitch`),
 					new ButtonBuilder()
 						.setStyle('Primary')
 						.setLabel('Youtube API Keys')
-						.setCustomId(`${interaction.user.id}-setModal_`),
+						.setCustomId(`${interaction.user.id}-setModal_youtube`),
 					new ButtonBuilder()
 						.setStyle('Primary')
 						.setLabel('Twitter API Keys')
-						.setCustomId(`${interaction.user.id}-setModal_`)
+						.setCustomId(`${interaction.user.id}-setModal_twitter`)
 				);
 			}
 			let components = [buttons];
@@ -144,7 +153,7 @@ module.exports = {
 				transcriptSelect.setDefaultChannels(settings.logs.transcripts);
 			const muteSelect = new ChannelSelectMenuBuilder()
 				.setCustomId(`setLogs-${interaction.user.id}_muteChannel`)
-				.setPlaceholder('Channel where mute command actions are logged.')
+				.setPlaceholder('Channel where mute/chat filter actions are logged.')
 				.addChannelTypes(ChannelType.GuildText);
 			if (settings.logs.mute) muteSelect.setDefaultChannels(settings.logs.mute);
 			const generalSelect = new ChannelSelectMenuBuilder()
@@ -152,7 +161,7 @@ module.exports = {
 				.setPlaceholder('Channel where general actions are logged.')
 				.addChannelTypes(ChannelType.GuildText);
 			if (settings.logs.general)
-				muteSelect.setDefaultChannels(settings.logs.general);
+				generalSelect.setDefaultChannels(settings.logs.general);
 
 			const selectTicket = new ActionRowBuilder().addComponents(ticketSelect);
 			const selectTranscript = new ActionRowBuilder().addComponents(
@@ -813,6 +822,149 @@ module.exports = {
 			});
 		}
 
+		if (customId === `setChatFilter-${interaction.user.id}`) {
+			embed.setTitle('Settings Menu | Chat Filter').setDescription(
+				`**__Information:__**
+				> Manage all the settings for \`${interaction.guild.name}\`.
+				> Blue buttons are for configurable settings and grey are for view only.
+				> *Note: Only the person who ran the command, can interact with things.*
+
+				**__List of Scam Links:__**
+				> These lists are what the bot runs through to prevent phishing or suspicious links from being posted.
+				> - Phishing: https://raw.githubusercontent.com/nikolaischunk/discord-phishing-links/main/domain-list.json
+				> - Suspicious:https://raw.githubusercontent.com/nikolaischunk/discord-phishing-links/main/suspicious-list.json
+
+				**__Notice:__**
+				> Due to Discord's limit, sadly the drop down can only display 25 options. So, the bot filters the options some, but feel free to use the "Other Input" button alongside a [Discord Channel ID](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID#h_01HRSTXPS5FMK2A5SMVSX4JW4E) to add a non-listed item.
+				
+				**__Action Details:__**
+				> - Warning Message: This is a simple message that pings the user telling them about their violation, then it will delete itself after a few seconds.
+				> - Auto Kick: This will automatically kick the user if they violate the filter 3 or more times within 5 minutes.
+
+				**__Actions:__**`
+			);
+
+			const settingsButtons = new ActionRowBuilder().addComponents(
+				new ButtonBuilder()
+					.setStyle('Primary')
+					.setLabel('Whitelists: Users, Roles, Content')
+					.setCustomId(`${interaction.user.id}-setModal_filterWhitelist`),
+				new ButtonBuilder()
+					.setStyle('Primary')
+					.setLabel('Blacklist Content')
+					.setCustomId(`${interaction.user.id}-setModal_filterBlacklist`)
+			);
+			const enableButtons = new ActionRowBuilder().addComponents(
+				new ButtonBuilder()
+					.setStyle(settings.chatFilter.enabled ? 'Success' : 'Danger')
+					.setLabel(
+						settings.chatFilter.enabled
+							? 'Chat Filter: Enabled'
+							: 'Chat Filter: Disabled'
+					)
+					.setCustomId(`setChatFilter-${interaction.user.id}_enableChatFilter`),
+				new ButtonBuilder()
+					.setStyle(settings.chatFilter.warningMessage ? 'Success' : 'Danger')
+					.setLabel(
+						settings.chatFilter.warningMessage
+							? 'Warning Message: Enabled'
+							: 'Warning Message: Disabled'
+					)
+					.setCustomId(
+						`setChatFilter-${interaction.user.id}_enableWarningMessage`
+					),
+				new ButtonBuilder()
+					.setStyle(settings.chatFilter.autoKick ? 'Success' : 'Danger')
+					.setLabel(
+						settings.chatFilter.autoKick
+							? 'Auto Kick: Enabled'
+							: 'Auto Kick: Disabled'
+					)
+					.setCustomId(`setChatFilter-${interaction.user.id}_enableAutoKick`)
+			);
+			buttons.addComponents(
+				new ButtonBuilder()
+					.setStyle('Secondary')
+					.setEmoji('1342334130947620974')
+					.setLabel('Back')
+					.setCustomId(`getHome-${interaction.user.id}`),
+				new ButtonBuilder()
+					.setStyle('Secondary')
+					.setEmoji('1342334132180619365')
+					.setLabel('Refresh List')
+					.setCustomId(`setChatFilter-${interaction.user.id}`)
+			);
+
+			try {
+				await interaction.message.edit({
+					embeds: [embed],
+					components: [settingsButtons, enableButtons, buttons],
+				});
+				await interaction.deferUpdate();
+			} catch (error) {
+				if (error) {
+					console.error(`setLogs Error Occurred:`, error);
+					await interaction.reply({
+						content:
+							'Message no longer editable or an error has occurred. Please rerun `/settings` or get help.',
+						flags: MessageFlags.Ephemeral,
+					});
+					interaction.message.delete();
+				}
+			}
+		}
+		if (customId === `setChatFilter-${interaction.user.id}_enableChatFilter`) {
+			await client.db
+				.collection('settings')
+				.updateOne(
+					{ id: interaction.guild.id },
+					{ $set: { 'chatFilter.enabled': !settings.chatFilter.enabled } }
+				);
+
+			interaction.reply({
+				content: `Changes the status of the **Chat Filter** to: \`${
+					!settings.chatFilter.enabled ? 'Disabled' : 'Enabled'
+				}\``,
+				flags: MessageFlags.Ephemeral,
+			});
+		}
+		if (
+			customId === `setChatFilter-${interaction.user.id}_enableWarningMessage`
+		) {
+			await client.db.collection('settings').updateOne(
+				{ id: interaction.guild.id },
+				{
+					$set: {
+						'chatFilter.warningMessage': !settings.chatFilter.warningMessage,
+					},
+				}
+			);
+
+			interaction.reply({
+				content: `Changes the status of **Warning Message** to: \`${
+					!settings.chatFilter.warningMessage ? 'Disabled' : 'Enabled'
+				}\``,
+				flags: MessageFlags.Ephemeral,
+			});
+		}
+		if (customId === `setChatFilter-${interaction.user.id}_enableAutoKick`) {
+			await client.db.collection('settings').updateOne(
+				{ id: interaction.guild.id },
+				{
+					$set: {
+						'chatFilter.autoKick': !settings.chatFilter.autoKick,
+					},
+				}
+			);
+
+			interaction.reply({
+				content: `Changes the status of **Auto Kick** to: \`${
+					!settings.chatFilter.autoKick ? 'Disabled' : 'Enabled'
+				}\``,
+				flags: MessageFlags.Ephemeral,
+			});
+		}
+
 		if (customId.includes(`${interaction.user.id}-setModal_`)) {
 			const type = customId.split(`${interaction.user.id}-setModal_`)[1];
 
@@ -982,6 +1134,50 @@ module.exports = {
 				modal.addComponents(
 					new ActionRowBuilder().addComponents(profileImageUrl)
 				);
+			} else if (type == 'filterWhitelist') {
+				modal.setTitle('Chat Filter Whitelists');
+
+				const userIds = new TextInputBuilder()
+					.setLabel('User IDs (Comma Separated)')
+					.setStyle(TextInputStyle.Paragraph)
+					.setPlaceholder('123123815801,1298419028401924,1290481902840')
+					.setCustomId('users')
+					.setRequired(false);
+				if (settings.chatFilter.whitelist.users.length > 0)
+					userIds.setValue(settings.chatFilter.whitelist.users.join(','));
+				const roleIds = new TextInputBuilder()
+					.setLabel('Role IDs (Comma Separated)')
+					.setStyle(TextInputStyle.Paragraph)
+					.setPlaceholder('123123815801,1298419028401924,1290481902840')
+					.setCustomId('roles')
+					.setRequired(false);
+				if (settings.chatFilter.whitelist.roles.length > 0)
+					roleIds.setValue(settings.chatFilter.whitelist.roles.join(','));
+				const content = new TextInputBuilder()
+					.setLabel('Content (Comma Separated)')
+					.setStyle(TextInputStyle.Paragraph)
+					.setPlaceholder('discord.gg/shadowdevs,your mom,idk.com')
+					.setCustomId('content')
+					.setRequired(false);
+				if (settings.chatFilter.whitelist.content.length > 0)
+					content.setValue(settings.chatFilter.whitelist.content.join(','));
+
+				modal.addComponents(new ActionRowBuilder().addComponents(userIds));
+				modal.addComponents(new ActionRowBuilder().addComponents(roleIds));
+				modal.addComponents(new ActionRowBuilder().addComponents(content));
+			} else if (type == 'filterBlacklist') {
+				modal.setTitle('Chat Filter Blacklisted Content');
+
+				const content = new TextInputBuilder()
+					.setLabel('Content (Comma Separated)')
+					.setStyle(TextInputStyle.Paragraph)
+					.setPlaceholder('discord.gg/shadowdevs,your mom,idk.com')
+					.setCustomId('content')
+					.setRequired(false);
+				if (settings.chatFilter.blacklist.length > 0)
+					content.setValue(settings.chatFilter.blacklist.join(','));
+
+				modal.addComponents(new ActionRowBuilder().addComponents(content));
 			}
 
 			await interaction.showModal(modal);
@@ -1234,6 +1430,70 @@ module.exports = {
 
 				await interaction.editReply({
 					content: `The following Twitter API Settings were updated:\n> - ${
+						updated.length > 0 ? updated.join('\n> - ') : 'None'
+					}`,
+					flags: MessageFlags.Ephemeral,
+				});
+			} else if (type == 'filterWhitelist') {
+				const updated = [];
+				const users = interaction.fields.getTextInputValue('users');
+				const roles = interaction.fields.getTextInputValue('roles');
+				const content = interaction.fields.getTextInputValue('content');
+
+				if (users) {
+					updated.push(`Users: \`${users}\``);
+
+					await client.db
+						.collection('settings')
+						.updateOne(
+							{ id: interaction.guild.id },
+							{ $set: { 'chatFilter.whitelist.users': users.split(',') } }
+						);
+				}
+				if (roles) {
+					updated.push(`Roles: \`${roles}\``);
+
+					await client.db
+						.collection('settings')
+						.updateOne(
+							{ id: interaction.guild.id },
+							{ $set: { 'chatFilter.whitelist.roles': roles.split(',') } }
+						);
+				}
+				if (content) {
+					updated.push(`Content: \`${content}\``);
+
+					await client.db
+						.collection('settings')
+						.updateOne(
+							{ id: interaction.guild.id },
+							{ $set: { 'chatFilter.whitelist.content': content.split(',') } }
+						);
+				}
+
+				await interaction.editReply({
+					content: `The following settings have been updated:\n> - ${
+						updated.length > 0 ? updated.join('\n> - ') : 'None'
+					}`,
+					flags: MessageFlags.Ephemeral,
+				});
+			} else if (type == 'filterBlacklist') {
+				const updated = [];
+				const content = interaction.fields.getTextInputValue('content');
+
+				if (content) {
+					updated.push(`Blacklist Content: \`${content}\``);
+
+					await client.db
+						.collection('settings')
+						.updateOne(
+							{ id: interaction.guild.id },
+							{ $set: { 'chatFilter.blacklist': content.split(',') } }
+						);
+				}
+
+				await interaction.editReply({
+					content: `The following settings have been updated:\n> - ${
 						updated.length > 0 ? updated.join('\n> - ') : 'None'
 					}`,
 					flags: MessageFlags.Ephemeral,
