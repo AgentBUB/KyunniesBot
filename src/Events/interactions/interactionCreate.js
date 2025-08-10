@@ -140,7 +140,8 @@ module.exports = {
 										}`,
 									}
 								);
-							cmdLogsChannel.send({ embeds: [embed] });
+
+							if (cmdLogsChannel) cmdLogsChannel.send({ embeds: [embed] });
 						}
 					}
 				}
