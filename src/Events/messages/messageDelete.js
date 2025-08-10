@@ -29,7 +29,7 @@ module.exports = {
 				name: message.author.tag,
 				iconURL: message.author.displayAvatarURL({ dynamic: true }),
 			})
-			.setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
+			.setThumbnail(message.author.displayAvatarURL({ dynamic: true }))
 			.setTitle('Message Deleted')
 			.addFields(
 				{ name: `**❯ Message ID:**`, value: message.id, inline: true },
