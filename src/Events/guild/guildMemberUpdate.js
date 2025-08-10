@@ -19,6 +19,10 @@ module.exports = {
 			const embed = new EmbedBuilder()
 				.setTitle('~Role Removed~')
 				.setColor('Orange')
+				.setAuthor({
+					name: oldMember.user.tag,
+					iconURL: oldMember.user.displayAvatarURL({ dynamic: true }),
+				})
 				.addFields(
 					{
 						name: 'Removed From',
@@ -62,6 +66,10 @@ module.exports = {
 			const embed = new EmbedBuilder()
 				.setTitle('~Role Added~')
 				.setColor('Green')
+				.setAuthor({
+					name: newMember.user.tag,
+					iconURL: newMember.user.displayAvatarURL({ dynamic: true }),
+				})
 				.addFields(
 					{
 						name: 'Added To',

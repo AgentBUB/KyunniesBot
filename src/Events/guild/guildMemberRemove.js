@@ -9,13 +9,16 @@ module.exports = {
 			(ch) => ch.id === settings.logs.general
 		);
 		if (joinNotify) {
-			joinNotify.send(
-				`${member} (${
-					member.user.discriminator !== '0'
-						? member.user.tag
-						: member.user.username
-				} - ${member.user.id}) **Left**`
-			);
+			const embed = new ShadowEmbed()
+				.setColor('Orange')
+				.setDescription(
+					`${member} (${member.user.username} - ${member.user.id}) **Left**`
+				)
+				.setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
+				.setTimestamp()
+				.setFooter({ text: 'Shadow Logging System' });
+
+			joinNotify.send({ embeds: [embed] });
 		}
 	},
 };

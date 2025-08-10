@@ -121,6 +121,10 @@ module.exports = {
 								.setTitle('Command Usage')
 								.setColor('Blurple')
 								.setTimestamp()
+								.setAuthor({
+									name: interaction.user.username,
+									iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
+								})
 								.setFooter({ text: 'Shadow Logging System' })
 								.addFields(
 									{

@@ -20,13 +20,16 @@ module.exports = {
 				(ch) => ch.id === settings.logs.general
 			);
 			if (joinNotify) {
-				joinNotify.send(
-					`${member} (${
-						member.user.discriminator !== '0'
-							? member.user.tag
-							: member.user.username
-					} - ${member.user.id}) **Joined**`
-				);
+				const embed = new ShadowEmbed()
+					.setColor('Green')
+					.setDescription(
+						`${member} (${member.user.username} - ${member.user.id}) **Joined**`
+					)
+					.setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
+					.setTimestamp()
+					.setFooter({ text: 'Shadow Logging System' });
+
+				joinNotify.send({ embeds: [embed] });
 			}
 
 			if (!settings?.muteRole) {
