@@ -70,6 +70,7 @@ module.exports = {
 					name: newMember.user.tag,
 					iconURL: newMember.user.displayAvatarURL({ dynamic: true }),
 				})
+				.setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
 				.addFields(
 					{
 						name: 'Added To',

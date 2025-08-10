@@ -1,6 +1,5 @@
 const ShadowEmbed = require('../../Structures/ShadowEmbed');
-const { escapeMarkdown, AttachmentBuilder } = require('discord.js');
-const { diffWordsWithSpace } = require('diff');
+const { AttachmentBuilder } = require('discord.js');
 
 module.exports = {
 	name: 'messageUpdate',
@@ -41,6 +40,7 @@ function createMessageUpdateEmbed(oldMessage, newMessage) {
 			name: newMessage.author.tag,
 			iconURL: newMessage.author.displayAvatarURL({ dynamic: true }),
 		})
+		.setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
 		.setTitle('Message Updated')
 		.addFields(
 			{ name: `**❯ Message ID:**`, value: oldMessage.id, inline: true },

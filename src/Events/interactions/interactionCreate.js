@@ -125,6 +125,7 @@ module.exports = {
 									name: interaction.user.username,
 									iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
 								})
+								.setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
 								.setFooter({ text: 'Shadow Logging System' })
 								.addFields(
 									{

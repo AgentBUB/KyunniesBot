@@ -101,6 +101,7 @@ module.exports = {
 				const embed = new EmbedBuilder()
 					.setColor('Red')
 					.setTitle('Muted User')
+					.setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
 					.addFields([
 						{
 							name: 'User',
