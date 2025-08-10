@@ -45,7 +45,15 @@ module.exports = {
 				user: user.id,
 			});
 
-			const currentRoles = user.roles.cache.map((role) => role.id);
+			const botMember = interaction.guild.members.me;
+			const botHighestRole = botMember.roles.highest;
+			const manageableRoles = user.roles.cache.filter((role) => {
+				if (role.id === interaction.guild.id) return false;
+				if (role.position >= botHighestRole.position) return false;
+				if (role.managed) return false;
+				return true;
+			});
+			const currentRoles = manageableRoles.map((role) => role.id);
 			if (currentlyMuted) {
 				await client.db.collection('muted').updateOne(
 					{ id: interaction.guild.id, user: user.id },
@@ -63,7 +71,8 @@ module.exports = {
 					roles: currentRoles,
 				});
 			}
-			await user.roles.set([settings.muteRole]);
+			await user.roles.add(settings.muteRole);
+			await user.roles.remove(currentRoles);
 
 			const muteEntry = await client.db.collection('muted').findOne({
 				id: interaction.guild.id,

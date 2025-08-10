@@ -84,15 +84,15 @@ module.exports = {
 					new ButtonBuilder()
 						.setStyle('Primary')
 						.setLabel('Twitch API Keys')
-						.setCustomId(`setModal_twitch`),
+						.setCustomId(`${interaction.user.id}-setModal_`),
 					new ButtonBuilder()
 						.setStyle('Primary')
 						.setLabel('Youtube API Keys')
-						.setCustomId('setModal_youtube'),
+						.setCustomId(`${interaction.user.id}-setModal_`),
 					new ButtonBuilder()
 						.setStyle('Primary')
 						.setLabel('Twitter API Keys')
-						.setCustomId('setModal_twitter')
+						.setCustomId(`${interaction.user.id}-setModal_`)
 				);
 			}
 			let components = [buttons];
@@ -175,7 +175,7 @@ module.exports = {
 					.setStyle('Primary')
 					.setEmoji('1342400401688891412')
 					.setLabel('Other Input')
-					.setCustomId('setModal_logs')
+					.setCustomId(`${interaction.user.id}-setModal_logs`)
 			);
 
 			try {
@@ -364,7 +364,7 @@ module.exports = {
 					.setStyle('Primary')
 					.setEmoji('1342400401688891412')
 					.setLabel('Other Input')
-					.setCustomId('setModal_notify')
+					.setCustomId(`${interaction.user.id}-setModal_notify`)
 			);
 
 			try {
@@ -644,7 +644,7 @@ module.exports = {
 					.setStyle('Primary')
 					.setEmoji('1342400401688891412')
 					.setLabel('Other Input')
-					.setCustomId('setModal_ping')
+					.setCustomId(`${interaction.user.id}-setModal_ping`)
 			);
 
 			try {
@@ -813,8 +813,8 @@ module.exports = {
 			});
 		}
 
-		if (customId.includes('setModal_')) {
-			const type = customId.split('Modal_')[1];
+		if (customId.includes(`${interaction.user.id}-setModal_`)) {
+			const type = customId.split(`${interaction.user.id}-setModal_`)[1];
 
 			const modal = new ModalBuilder()
 				.setCustomId(`setModalSubmit_${type}`)

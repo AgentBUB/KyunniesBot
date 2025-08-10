@@ -70,15 +70,15 @@ module.exports = {
 				new ButtonBuilder()
 					.setStyle('Primary')
 					.setLabel('Twitch API Keys')
-					.setCustomId('setModal_twitch'),
+					.setCustomId(`${interaction.user.id}-setModal_`),
 				new ButtonBuilder()
 					.setStyle('Primary')
 					.setLabel('Youtube API Keys')
-					.setCustomId('setModal_youtube'),
+					.setCustomId(`${interaction.user.id}-setModal_`),
 				new ButtonBuilder()
 					.setStyle('Primary')
 					.setLabel('Twitter API Keys')
-					.setCustomId('setModal_twitter')
+					.setCustomId(`${interaction.user.id}-setModal_`)
 			);
 		}
 

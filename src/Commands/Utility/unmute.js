@@ -40,7 +40,14 @@ module.exports = {
 				await user.roles.remove(settings.muteRole);
 
 			if (currentlyMuted) {
-				await user.roles.set(currentlyMuted.roles);
+				for (const role of currentlyMuted.roles) {
+					try {
+						await user.roles.add(role);
+					} catch (error) {
+						// fuck off
+					}
+				}
+
 				await client.db.collection('muted').deleteOne({
 					id: interaction.guild.id,
 					user: user.id,
