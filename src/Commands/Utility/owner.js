@@ -299,17 +299,6 @@ module.exports = {
 					flags: MessageFlags.Ephemeral,
 				});
 			}
-		} else if (cmd === 'bdreset') {
-			const member = interaction.options.get('user')?.user;
-
-			await client.db
-				.collection('bdays')
-				.deleteOne({ id: interaction.guild.id, user: interaction.user.id });
-
-			await interaction.reply({
-				content: `${member}'s database has been deleted.`,
-				flags: MessageFlags.Ephemeral,
-			});
 		} else {
 			await interaction.reply({
 				content: `erm what`,
