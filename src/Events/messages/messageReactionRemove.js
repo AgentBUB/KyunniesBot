@@ -1,6 +1,7 @@
 module.exports = {
 	name: 'messageReactionRemove',
 	execute: async (reaction, user, _, client) => {
+		if (user.bot) return;
 		if (reaction.partial) await reaction.fetch();
 
 		const data = await client.db.collection('reactRoles').findOne({
