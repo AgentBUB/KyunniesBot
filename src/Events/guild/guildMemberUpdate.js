@@ -27,15 +27,8 @@ module.exports = {
 				.addFields(
 					{
 						name: 'Removed From',
-						value: `**❯ Username**: ${
-							oldMember.user.discriminator !== '0'
-								? oldMember.user.tag
-								: oldMember.user.username
-						}${
-							oldMember.user.discriminator !== '0'
-								? `\n**❯ Discriminator:** ${oldMember.user.discriminator}`
-								: ''
-						}
+						value: `**❯ Username**: ${oldMember.user.username}
+				**❯ Display Name:** ${oldMember.user.displayName}
 				**❯ ID:** ${oldMember.user.id}
 				**❯ Mention:** ${oldMember.user}
 				\u200b`,
@@ -75,15 +68,8 @@ module.exports = {
 				.addFields(
 					{
 						name: 'Added To',
-						value: `**❯ Username**: ${
-							newMember.user.discriminator !== '0'
-								? newMember.user.tag
-								: newMember.user.username
-						}${
-							newMember.user.discriminator !== '0'
-								? `\n**❯ Discriminator:** ${newMember.user.discriminator}`
-								: ''
-						}
+						value: `**❯ Username**: ${newMember.user.username}
+				**❯ Display Name:** ${newMember.user.displayName}
 				**❯ ID:** ${newMember.user.id}
 				**❯ Mention:** ${newMember.user}
 				\u200b`,

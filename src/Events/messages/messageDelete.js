@@ -40,7 +40,7 @@ module.exports = {
 				},
 				{
 					name: `**❯ Author:**`,
-					value: `Mention: \`${message.author}\` \nUsername: \`${message.author.tag}\` \nID: \`${message.author.id}\``,
+					value: `Mention: ${message.author}\nDisplay Name: \`${message.author.displayName}\`\nUsername: \`${message.author.tag}\` \nID: \`${message.author.id}\``,
 				}
 			)
 			.setTimestamp()
