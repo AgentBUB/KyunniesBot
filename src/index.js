@@ -35,6 +35,7 @@ const client = new Client({
 		GatewayIntentBits.DirectMessageReactions,
 		GatewayIntentBits.DirectMessageTyping,
 		GatewayIntentBits.MessageContent,
+		GatewayIntentBits.GuildVoiceStates,
 	],
 	shards: 'auto',
 	partials: [

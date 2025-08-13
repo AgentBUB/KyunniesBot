@@ -23,6 +23,7 @@ module.exports = {
 		const attachments = message.attachments.size
 			? message.attachments.map((attachment) => attachment.proxyURL)
 			: null;
+
 		const embed = new ShadowEmbed()
 			.setColor('#0099ff')
 			.setAuthor({
@@ -45,15 +46,18 @@ module.exports = {
 			)
 			.setTimestamp()
 			.setFooter({ text: 'Shadow Logging System' });
-		if (attachments) {
-			embed.addFields({
-				name: `**❯ Attachments:**`,
-				value: `${attachments.join('\n')}`,
-			});
-		}
 		if (message.content.length) {
 			embed.splitFields(`**❯ Deleted Message:** \n${message.content}`);
 		}
-		channel.send({ embeds: [embed] });
+		if (attachments) {
+			embed.addFields({
+				name: `**❯ Attachments:**`,
+				value: `*View them above this embed.*`,
+			});
+
+			channel.send({ embeds: [embed], files: attachments });
+		} else {
+			channel.send({ embeds: [embed] });
+		}
 	},
 };
