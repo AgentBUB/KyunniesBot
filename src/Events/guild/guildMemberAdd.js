@@ -3,11 +3,11 @@ const { EmbedBuilder } = require('discord.js');
 module.exports = {
 	name: 'guildMemberAdd',
 	execute: async (member, client) => {
-		try {
-			const settings = await client.db.collection('settings').findOne({
-				id: member.guild.id,
-			});
+		const settings = await client.db.collection('settings').findOne({
+			id: member.guild.id,
+		});
 
+		try {
 			const joinNotify = member.guild.channels.cache.find(
 				(ch) => ch.id === settings.logs.general
 			);
@@ -24,7 +24,27 @@ module.exports = {
 
 				joinNotify.send({ embeds: [embed] });
 			}
+		} catch (error) {
+			console.error(`Error when processing join log ${muteEntry.user}:`, error);
+		}
 
+		try {
+			const welcomeChannel = member.guild.channels.cache.find(
+				(ch) => ch.name === 'welcome'
+			);
+			if (welcomeChannel) {
+				welcomeChannel.send(
+					`Welcome to **${member.guild.name}**, ${member}! We are happy to see you, and hope you enjoy your stay. <3`
+				);
+			}
+		} catch (error) {
+			console.error(
+				`Error when processing welcome channel message ${muteEntry.user}:`,
+				error
+			);
+		}
+
+		try {
 			const activeMute = await client.db.collection('muted').findOne({
 				id: member.guild.id,
 				user: member.id,
