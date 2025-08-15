@@ -63,6 +63,11 @@ module.exports = {
 					},
 					blacklist: [],
 				},
+				levels: {
+					enabled: false,
+					xp: 5,
+					level: 100,
+				},
 			});
 		}
 
@@ -76,6 +81,41 @@ module.exports = {
 			message.reply(
 				`I use slash commands, so please do \`/\` to begin a command. *Do \`/help\` for more information.*`
 			);
+		}
+
+		if (message.guild && settings.levels.enabled) {
+			let data = await client.db
+				.collection('levels')
+				.findOne({ id: message.guild?.id, user: message.author?.id });
+
+			if (!data) {
+				await client.db.collection('levels').insertOne({
+					id: message.guild?.id,
+					user: message.author?.id,
+					xp: settings.levels.xp,
+					level: 0,
+					lastLevelUp: null,
+				});
+			} else {
+				await client.db
+					.collection('levels')
+					.updateOne(
+						{ id: message.guild?.id, user: message.author?.id },
+						{ $inc: { xp: settings.levels.xp } }
+					);
+				data = await client.db
+					.collection('levels')
+					.findOne({ id: message.guild?.id, user: message.author?.id });
+
+				if ((data.level + 1) * settings.levels.level <= data.xp) {
+					await client.db
+						.collection('levels')
+						.updateOne(
+							{ id: message.guild?.id, user: message.author?.id },
+							{ $inc: { level: 1 }, $set: { lastLevelUp: new Date() } }
+						);
+				}
+			}
 		}
 	},
 };

@@ -65,11 +65,17 @@ module.exports = {
 			new ButtonBuilder()
 				.setStyle('Primary')
 				.setLabel('Mute Role')
-				.setCustomId(`setMuteRole-${interaction.user.id}`),
+				.setCustomId(`setMuteRole-${interaction.user.id}`)
+		);
+		const buttonsTwo = new ActionRowBuilder().addComponents(
 			new ButtonBuilder()
 				.setStyle('Primary')
 				.setLabel('Chat Filter')
-				.setCustomId(`setChatFilter-${interaction.user.id}`)
+				.setCustomId(`setChatFilter-${interaction.user.id}`),
+			new ButtonBuilder()
+				.setStyle('Primary')
+				.setLabel('Levels')
+				.setCustomId(`setLevels-${interaction.user.id}`)
 		);
 
 		let ownerButtons;
@@ -90,8 +96,8 @@ module.exports = {
 			);
 		}
 
-		let components = [buttons];
-		if (isOwner) components = [buttons, ownerButtons];
+		let components = [buttons, buttonsTwo];
+		if (isOwner) components = [buttons, buttonsTwo, ownerButtons];
 
 		await interaction.reply({
 			embeds: [embed],

@@ -75,6 +75,11 @@ module.exports = {
 					},
 					blacklist: [],
 				},
+				levels: {
+					enabled: false,
+					xp: 5,
+					level: 100,
+				},
 			});
 		}
 

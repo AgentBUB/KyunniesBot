@@ -58,6 +58,11 @@ module.exports = {
 						value:
 							'> Enable/Disable the chat filter and configure its settings.',
 					},
+					{
+						name: 'Levels',
+						value:
+							'> Change xp gain, level requirements, roles for levels, etc.',
+					},
 				])
 				.setFooter({
 					text: `Kyunnies Bot Settings System`,
@@ -80,11 +85,17 @@ module.exports = {
 				new ButtonBuilder()
 					.setStyle('Primary')
 					.setLabel('Mute Role')
-					.setCustomId(`setMuteRole-${interaction.user.id}`),
+					.setCustomId(`setMuteRole-${interaction.user.id}`)
+			);
+			const buttonsTwo = new ActionRowBuilder().addComponents(
 				new ButtonBuilder()
 					.setStyle('Primary')
 					.setLabel('Chat Filter')
-					.setCustomId(`setChatFilter-${interaction.user.id}`)
+					.setCustomId(`setChatFilter-${interaction.user.id}`),
+				new ButtonBuilder()
+					.setStyle('Primary')
+					.setLabel('Levels')
+					.setCustomId(`setLevels-${interaction.user.id}`)
 			);
 
 			let ownerButtons;
@@ -104,8 +115,8 @@ module.exports = {
 						.setCustomId(`${interaction.user.id}-setModal_twitter`)
 				);
 			}
-			let components = [buttons];
-			if (isOwner) components = [buttons, ownerButtons];
+			let components = [buttons, buttonsTwo];
+			if (isOwner) components = [buttons, buttonsTwo, ownerButtons];
 
 			try {
 				await interaction.message.edit({
@@ -965,6 +976,80 @@ module.exports = {
 			});
 		}
 
+		if (customId === `setLevels-${interaction.user.id}`) {
+			embed.setTitle('Settings Menu | Levels').setDescription(
+				`**__Information:__**
+				> Manage all the settings for \`${interaction.guild.name}\`.
+				> Blue buttons are for configurable settings and grey are for view only.
+				> *Note: Only the person who ran the command, can interact with things.*
+
+				**__Notice:__**
+				> Due to Discord's limit, sadly the drop down can only display 25 options. So, the bot filters the options some, but feel free to use the "Other Input" button alongside a [Discord Channel ID](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID#h_01HRSTXPS5FMK2A5SMVSX4JW4E) to add a non-listed item.
+
+				**__Actions:__**`
+			);
+
+			const actionButtons = new ActionRowBuilder().addComponents(
+				new ButtonBuilder()
+					.setStyle(settings.levels.enabled ? 'Success' : 'Danger')
+					.setLabel(
+						settings.levels.enabled
+							? 'Level System: Enabled'
+							: 'Level System: Disabled'
+					)
+					.setCustomId(`enableLevels-${interaction.user.id}`),
+				new ButtonBuilder()
+					.setStyle('Primary')
+					.setLabel('XP Settings')
+					.setCustomId(`${interaction.user.id}-setModal_levelXp`)
+			);
+			buttons.addComponents(
+				new ButtonBuilder()
+					.setStyle('Secondary')
+					.setEmoji('1342334130947620974')
+					.setLabel('Back')
+					.setCustomId(`getHome-${interaction.user.id}`),
+				new ButtonBuilder()
+					.setStyle('Secondary')
+					.setEmoji('1342334132180619365')
+					.setLabel('Refresh List')
+					.setCustomId(`setLevels-${interaction.user.id}`)
+			);
+
+			try {
+				await interaction.message.edit({
+					embeds: [embed],
+					components: [actionButtons, buttons],
+				});
+				await interaction.deferUpdate();
+			} catch (error) {
+				if (error) {
+					console.error(`setLogs Error Occurred:`, error);
+					await interaction.reply({
+						content:
+							'Message no longer editable or an error has occurred. Please rerun `/settings` or get help.',
+						flags: MessageFlags.Ephemeral,
+					});
+					interaction.message.delete();
+				}
+			}
+		}
+		if (customId === `enableLevels-${interaction.user.id}`) {
+			await client.db
+				.collection('settings')
+				.updateOne(
+					{ id: interaction.guild.id },
+					{ $set: { 'levels.enabled': !settings.levels.enabled } }
+				);
+
+			interaction.reply({
+				content: `Set ticket system status to: ${
+					!settings.levels.enabled ? 'Enabled' : 'Disabled'
+				}.`,
+				flags: MessageFlags.Ephemeral,
+			});
+		}
+
 		if (customId.includes(`${interaction.user.id}-setModal_`)) {
 			const type = customId.split(`${interaction.user.id}-setModal_`)[1];
 
@@ -1178,6 +1263,26 @@ module.exports = {
 					content.setValue(settings.chatFilter.blacklist.join(','));
 
 				modal.addComponents(new ActionRowBuilder().addComponents(content));
+			} else if (type == 'levelXp') {
+				const xp = new TextInputBuilder()
+					.setLabel('XP Gained Per Message')
+					.setStyle(TextInputStyle.Short)
+					.setCustomId('xp')
+					.setRequired(false);
+				if (settings.levels.xp) xp.setValue(String(settings.levels.xp));
+				const levelReq = new TextInputBuilder()
+					.setLabel('XP Multiplied for Level Requirement')
+					.setStyle(TextInputStyle.Short)
+					.setPlaceholder(
+						'100 (This means each level is multiplied by 100, ie: level 2 requires 200xp)'
+					)
+					.setCustomId('levelReq')
+					.setRequired(false);
+				if (settings.levels.xp)
+					levelReq.setValue(String(settings.levels.level));
+
+				modal.addComponents(new ActionRowBuilder().addComponents(xp));
+				modal.addComponents(new ActionRowBuilder().addComponents(levelReq));
 			}
 
 			await interaction.showModal(modal);
@@ -1494,6 +1599,38 @@ module.exports = {
 
 				await interaction.editReply({
 					content: `The following settings have been updated:\n> - ${
+						updated.length > 0 ? updated.join('\n> - ') : 'None'
+					}`,
+					flags: MessageFlags.Ephemeral,
+				});
+			} else if (type == 'levelXp') {
+				const updated = [];
+				const xp = interaction.fields.getTextInputValue('xp');
+				const levelReq = interaction.fields.getTextInputValue('levelReq');
+
+				if (xp) {
+					updated.push(`XP Gained Per Messaged: \`${xp}\``);
+
+					await client.db
+						.collection('settings')
+						.updateOne(
+							{ id: interaction.guild.id },
+							{ $set: { 'levels.xp': Number(xp) || 1 } }
+						);
+				}
+				if (levelReq) {
+					updated.push(`XP Multiplied for Level Requirement: \`${levelReq}\``);
+
+					await client.db
+						.collection('settings')
+						.updateOne(
+							{ id: interaction.guild.id },
+							{ $set: { 'levels.level': Number(levelReq) || 100 } }
+						);
+				}
+
+				await interaction.editReply({
+					content: `The following Level System Settings were updated:\n> - ${
 						updated.length > 0 ? updated.join('\n> - ') : 'None'
 					}`,
 					flags: MessageFlags.Ephemeral,
