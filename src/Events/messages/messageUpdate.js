@@ -51,7 +51,7 @@ function createMessageUpdateEmbed(oldMessage, newMessage) {
 			},
 			{
 				name: `**❯ Author:**`,
-				value: `Mention: ${message.author}\nDisplay Name: \`${message.author.displayName}\`\nUsername: \`${message.author.tag}\` \nID: \`${message.author.id}\``,
+				value: `Mention: ${newMessage.author}\nDisplay Name: \`${newMessage.author.displayName}\`\nUsername: \`${newMessage.author.tag}\` \nID: \`${newMessage.author.id}\``,
 			}
 		)
 		.setTimestamp()
