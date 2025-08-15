@@ -39,13 +39,14 @@ module.exports = {
 				.collection('levels')
 				.findOne({ id: interaction.guild?.id, user: member.id });
 
+			const nextLevelXp = (data.level * 2 + 1) * settings.levels.level;
 			Font.loadDefault();
 			const card = new RankCardBuilder()
 				.setUsername(guildMember.username)
 				.setDisplayName(guildMember.displayName)
 				.setAvatar(guildMember.displayAvatarURL({ format: 'png', size: 512 }))
 				.setCurrentXP(data.xp)
-				.setRequiredXP((data.level + 1) * settings.levels.level)
+				.setRequiredXP(nextLevelXp)
 				.setLevel(data.level)
 				.setBackground('https://shadowdevs.com/img/cozyFluff.jpg');
 			const pngBuffer = await card.build({
@@ -53,6 +54,11 @@ module.exports = {
 			});
 
 			interaction.reply({
+				content: `Last Level Up Date: ${
+					data.lastLevelUp
+						? `<t:${new Date(data.lastLevelUp).getTime()}:f>`
+						: 'N/A'
+				}`,
 				files: [pngBuffer],
 				flags: MessageFlags.Ephemeral,
 			});
@@ -64,8 +70,20 @@ module.exports = {
 				.limit(10)
 				.toArray();
 
+			const leadersFormatted = [];
+			leaders.forEach((item) => {
+				leadersFormatted.push(
+					`1. <@${item.user}>: Level ${item.level} with ${
+						item.xp
+					}xp | Last Level Up Date: ${
+						item.lastLevelUp
+							? `<t:${new Date(item.lastLevelUp).getTime()}:f>`
+							: 'N/A'
+					}\n`
+				);
+			});
 			interaction.reply({
-				content: `# Top 10 Levels\n1. <@${leaders[0].user}>: ${leaders[0].level} (${leaders[0].xp}xp)`,
+				content: `# Top 10 Levels\n${leadersFormatted}`,
 				flags: MessageFlags.Ephemeral,
 			});
 		}

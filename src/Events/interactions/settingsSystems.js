@@ -986,6 +986,11 @@ module.exports = {
 				**__Notice:__**
 				> Due to Discord's limit, sadly the drop down can only display 25 options. So, the bot filters the options some, but feel free to use the "Other Input" button alongside a [Discord Channel ID](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID#h_01HRSTXPS5FMK2A5SMVSX4JW4E) to add a non-listed item.
 
+				**__Level Up Details:__**
+				> Each level's XP requirement will be equal to the previous level's requirement + 1 then multiplied by the number you set in the XP settings.
+				> __Example:__
+				> - If you set "XP Multiplied for Level Requirement" to 100, these are the values: Level 1 = 100xp, Level 2 = 300xp, Level 3 = 500xp
+
 				**__Actions:__**`
 			);
 

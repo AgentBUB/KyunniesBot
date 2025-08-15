@@ -107,12 +107,13 @@ module.exports = {
 					.collection('levels')
 					.findOne({ id: message.guild?.id, user: message.author?.id });
 
-				if ((data.level + 1) * settings.levels.level <= data.xp) {
+				const nextLevelXp = (data.level * 2 + 1) * settings.levels.level;
+				if (nextLevelXp <= data.xp) {
 					await client.db
 						.collection('levels')
 						.updateOne(
 							{ id: message.guild?.id, user: message.author?.id },
-							{ $inc: { level: 1 }, $set: { lastLevelUp: new Date() } }
+							{ $inc: { level: 1 }, $set: { lastLevelUp: new Date(), xp: 0 } }
 						);
 				}
 			}
